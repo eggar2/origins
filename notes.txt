@@ -1,0 +1,106 @@
+ORIGINS PROUCT MENU REMAKE:
+
+DB Structure
+	Tables
+		custom_type
+			[
+				id : int
+				name : varchar
+				description : text
+				slug : varchar(returned from wp after saving as WP menu category)
+			]
+		custom_sub_type
+			[
+				id : int
+				name : varchar
+				description : text
+				slug : varchar(returned from wp after saving as WP menu category)
+				parent : id (FK - custom_type)
+			]
+		custom_lifestyle
+			[
+				id : int
+				name : varchar
+				description : text
+				slug : varchar(returned from wp after saving as WP menu category)
+			]
+		custom_designation
+			[
+				id : int
+				name : varchar
+				description : text
+				slug : varchar(returned from wp after saving as WP menu category)
+			]
+		custom_farm
+			[
+				id : int
+				name : varchar
+				description : text
+			]
+		custom_menu
+			[
+				id : int
+				name : varchar
+				description : text
+				cbs_ratio : varchar
+				lab_result_link : varchar
+				prices : text -> object
+				special_tags : ids -> object
+				types : id
+				lifestyles : id
+				farm : id
+			]
+
+
+
+
+CSV IMPORTER
+
+https://github.com/bahaaldine/angular-csv-import
+
+search / filter
+multiple select + bulk delete
+sample csv
+frontend
+
+optional:
+
+
+- Print Menu - Client has change requests to be updated 
+	QUESTION: Can we make the requested changes while current dev work is still ongoing? 
+	If so, when will the changes be updated? 
+
+		- The development of the new structure will be worked on the development/staging site, so there's no problem updating the live site.
+
+- New Product Menu Structure / Categorization - USE NEW FORMAT WHEN RE-STRUCTURING MENU
+	Will the Lab Results PDFs be lost when the new products are re-imported and replace the current products in WP? 
+		- Just like the old process, the lab PDF results in the sheet will be a link to the uploaded file on the site
+	How are we going to import products in bulk in the new structure of the product menu/inventory?
+		- We will be creating a feature for that to fit with the new menu structure (currently working)
+
+
+https://www.screencast.com/t/J6VqidYxmwp
+
+
+
+================================================================================
+
+Price - add menu weight section
+Bulk Delete
+Search / Filter
+CSV Import - add a post(menu post type) on every menu added
+
+Frontend
+Print Menu
+
+================================================================================
+
+
+
+
+
+
+
+
+
+
