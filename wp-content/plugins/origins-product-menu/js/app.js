@@ -162,10 +162,13 @@ app.controller('postMenuController', function( $scope, $loading, $http, $filter,
                 if( data ){
                   $scope.selectedFarm = $scope.farms.filter(function(item) { return item.id == data.farm })[0];
                   $scope.selectedType = $scope.type_options.filter(function(item) { return item.id == data.type })[0];
-                  // $scope.selectedSubType = $scope.subtype_options.filter(function(item) { return item.id == data.subtype })[0];
+                  $scope.selectedSubType = $scope.subtype_options.filter(function(item) { return item.id == data.subtype })[0];
                   $scope.selectedLifestyle = $scope.lifestyles.filter(function(item) { return item.id == data.lifestyle })[0];
                   $scope.selectedSpecialTags = $scope.special_tags_option.filter(function(item) { return item.id == data.special_tags })[0];
                   $scope.prices = data.prices;  
+                
+                    $scope.onTypeSelected($scope.selectedType);  
+
                 }
                 
             });
@@ -187,9 +190,11 @@ app.controller('postMenuController', function( $scope, $loading, $http, $filter,
 
     $scope.onTypeSelected = function(type){
         $scope.subtype_options_filtered = $scope.subtype_options.filter(function(item) { return item.parent_type == type.id });
-        // console.log( $scope.subtype_options.filter(function(item) { return item.parent_type == type.id }) );
-        // console.log( $scope.subtype_options );
     };
+
+    $scope.onSubTypeSelected = function(subtype){
+        $scope.selectedSubType = subtype;
+    }
 
     // PRICES  
     $scope.addNewPrice = function() {
@@ -208,6 +213,8 @@ app.controller('postMenuController', function( $scope, $loading, $http, $filter,
 
     $scope.postMenu = function(menu){
 
+        console.log(menu);
+
         $loading.start('origins-loading');
 
         menu.lab_result_link = jQuery('#image_url').val();
@@ -217,15 +224,13 @@ app.controller('postMenuController', function( $scope, $loading, $http, $filter,
         else
             menu.farm = $scope.selectedFarm;
 
-        if( $scope.selectedType ) 
-            menu.type = $scope.selectedType.id;
-        else
-            menu.type = $scope.selectedType;
+        // if( $scope.selectedType ) 
+        //     menu.type = $scope.selectedType.id;
+        // else
+        //     menu.type = $scope.selectedType;
 
-        if( $scope.selectedSubType ) 
-            menu.subtype = $scope.selectedSubType.id;
-        else
-            menu.subtype = $scope.selectedType;
+        menu.type = $scope.selectedType.id;
+        menu.subtype = $scope.selectedSubType.id;
 
         if( $scope.selectedLifestyle ) 
             menu.lifestyle = $scope.selectedLifestyle.id;

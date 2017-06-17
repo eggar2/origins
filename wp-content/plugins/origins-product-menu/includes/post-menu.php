@@ -40,7 +40,7 @@
 
             <div class="form-group" ng-if="selectedType">
                 <label for="type">Sub Type:</label>
-                <select class="form-control" id="subtype" ng-model="selectedSubType" ng-options="s.name for s in subtype_options_filtered" required>
+                <select class="form-control" id="subtype" ng-model="selectedSubType" ng-change="onSubTypeSelected(selectedSubType)" ng-options="s.name for s in subtype_options_filtered" required>
                     <option value="">Choose Sub Type</option>
                 </select>
             </div>
