@@ -8,7 +8,7 @@
         <div class="col-md-12">
             <a href="<?php echo get_site_url(); ?>/wp-admin/admin.php?page=origins_add_menu" class="btn btn-success btn-md" id="add-farm"><i class="fa fa-plus" aria-hidden="true"></i> Add Menu</a>
             <a href="<?php echo get_site_url(); ?>/wp-admin/admin.php?page=origins_bulk_upload_menu" class="btn btn-success btn-md" id="add-farm"><i class="fa fa-file-text-o" aria-hidden="true"></i> Bulk Upload Menu</a>
-            <!-- <a href="#" class="btn btn-danger btn-md" id="bulk-delete-menu"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a> -->
+            <button type="button" ng-if="rowSelected.length > 0" class="btn btn-danger btn-md" id="bulk-delete-menu" ng-click="deleteMenu(rowSelected)"><i class="fa fa-trash" aria-hidden="true"></i> Delete</button>
 
             <div class="search pull-right">
                <input type="text" name="search">
@@ -41,7 +41,7 @@
                     <tbody>
                         <tr ng-repeat="menu in menus">
                             <td>
-                                <input type="checkbox">
+                                <input type="checkbox" ng-click="rowSeletionChanged(menu.id)">
                             </td>
                             <td>{{menu.id}}</td>
                             <td>{{menu.name}}</td>

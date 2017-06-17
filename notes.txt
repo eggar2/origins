@@ -96,11 +96,11 @@ Print Menu
 ================================================================================
 
 
+DELETE FROM custom_menu WHERE id IN(11,12)
 
 
 
 
-
-
-
-
+git add -u
+git commit -a -m "bulk delete"
+git push -u origin master

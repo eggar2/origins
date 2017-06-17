@@ -27,35 +27,35 @@
             <div class="form-group">
                 <label for="farm">Farm:</label>
                 <select ng-model="selectedFarm" id="farm" class="form-control" ng-options="farm.name for farm in farms track by farm.id">
-                    <option value="">Choose Farm</option>
+                    <option value="">--Select Farm--</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="type">Type:</label>
                 <select class="form-control" id="type" ng-model="selectedType" ng-change="onTypeSelected(selectedType)" ng-options="t.name for t in type_options" required>
-                    <option value="">Choose Type</option>
+                    <option value="">--Select Type--</option>
                 </select>
             </div>
 
             <div class="form-group" ng-if="selectedType">
                 <label for="type">Sub Type:</label>
                 <select class="form-control" id="subtype" ng-model="selectedSubType" ng-change="onSubTypeSelected(selectedSubType)" ng-options="s.name for s in subtype_options_filtered" required>
-                    <option value="">Choose Sub Type</option>
+                    <option value="">--Select Sub Type--</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="lifestyle">Lifestyle:</label>
                 <select id="lifestyle" class="form-control" ng-model="selectedLifestyle" ng-options="lifestyle.name for lifestyle in lifestyles" required>
-                    <option value="">Choose Lifestyle</option>
+                    <option value="">--Select Lifestyle--</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="special">Designation:</label>
                 <select id="special" class="form-control" ng-model="selectedSpecialTags" ng-options="special_tags.name for special_tags in special_tags_option">
-                    <option value="">Choose Designation</option>
+                    <option value="">--Select Designation--</option>
                 </select>
             </div>
 

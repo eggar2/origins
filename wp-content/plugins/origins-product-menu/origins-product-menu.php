@@ -220,7 +220,14 @@ add_action( 'wp_ajax_nopriv_delete_origins_menu', 'delete_origins_menu' );
 function delete_origins_menu(){
     global $wpdb;
     $menuId = $_POST['menuId'];
-    $response = $wpdb->delete( 'custom_menu', array('id' => $menuId) );
+    
+    if( is_array($menuId) ){
+        $menuIds = implode( ',', array_map( 'absint', $menuId ) );
+        $response = $wpdb->query( "DELETE FROM custom_menu WHERE id IN(". $menuIds .")" );
+    }else{
+        $response = $wpdb->delete( 'custom_menu', array('id' => $menuId) );
+    }
+
     echo json_encode($response);
     wp_die();
 }

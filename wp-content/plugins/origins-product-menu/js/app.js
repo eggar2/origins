@@ -16,8 +16,14 @@ app.controller('mainController', function( $scope, $loading, $http, $filter, men
 
     $scope.loadMenu = function(page){
         $loading.start('origins-loading');
+        console.log('asdasdasd');
         menuService.getAllMenu(page).then(function(data){
-            $scope.menus = data;
+
+            if( data.length <= 0 && $scope.current_page != 1 ) //reset to page 1 if no items && not page 1
+                $scope.setPage( 1 );
+            else
+                $scope.menus = data;
+
             $loading.finish('origins-loading');
         });
     }
@@ -28,6 +34,9 @@ app.controller('mainController', function( $scope, $loading, $http, $filter, men
     $scope.setPage = function(page){
 
         PagerService.getTotalItems().then(function(data){
+
+            $scope.rowSelected = [];
+
             $scope.totalItems = data;
             $scope.pager = {};
             if (page < 1 || page > $scope.pager.totalPages) {
@@ -45,8 +54,9 @@ app.controller('mainController', function( $scope, $loading, $http, $filter, men
 
     // PAGINATION ====================================================
 
-    // DELETE
+    // DELETE SINGLE MENU
     $scope.deleteMenu = function(menuId){
+
         var modalInstance = $uibModal.open({
             animation: true,
             templateUrl: 'deleteMenuModal.html',
@@ -61,10 +71,24 @@ app.controller('mainController', function( $scope, $loading, $http, $filter, men
         modalInstance.result.then(function () { //submitted
             toastr.success('Successfully deleted menu');
             $scope.loadMenu($scope.current_page);
-            // $scope.setPage();
         }, function () { //cancelled
         });
     };
+
+    // DELETE SELECTED ROWS
+    // $scope.deleteRows = function(){
+    //     console.log($scope.rowSelected);
+        
+    // }
+
+    $scope.rowSeletionChanged = function (menu) {
+        if($scope.rowSelected.indexOf(menu) !== -1) { //if exists
+            $scope.rowSelected.splice($scope.rowSelected.indexOf(menu), 1);
+        }else{
+            $scope.rowSelected.push(menu);
+        }
+        console.log($scope.rowSelected);
+    }
 
 });
 
@@ -127,7 +151,6 @@ app.service('PagerService', function ($http, $q, $loading) {
                 data : { action : 'origins_get_total_items' },
                 dataType: 'json',
                 beforeSend: function() {
-                    console.log('requesting menus...');
                 },
                 success : function( response ) {
                     deferred.resolve(response);
@@ -295,7 +318,6 @@ app.service('menuService', function ($http, $q, $loading) {
                 data : { action : 'get_menus', page : page },
                 dataType: 'json',
                 beforeSend: function() {
-                    console.log('requesting menus...');
                 },
                 success : function( response ) {
                     deferred.resolve(response);
@@ -353,7 +375,6 @@ app.service('menuService', function ($http, $q, $loading) {
                     console.log('requesting farms...');
                 },
                 success : function( response ) {
-                    console.log(response);
                     deferred.resolve(response);
                 }
             });
