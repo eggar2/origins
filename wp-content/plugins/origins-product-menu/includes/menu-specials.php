@@ -1,7 +1,7 @@
 <div ng-app="origins" ng-controller="mainSpecialController" dw-loading="origins-loading" dw-loading-options="{text: 'Loading Specials...'}">
     <div class="container" id="all-special-portal">
 
-        <h3>Origins Menu specials</h3>
+        <h3>Origins Menu Designations</h3>
 
         <hr style="border: 3px solid rgba(49,37,28,0.9);"> 
 
@@ -16,6 +16,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Slug</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th>Controls</th>
@@ -24,6 +25,7 @@
                     <tbody>
                         <tr ng-repeat="special in specials">
                             <td>{{special.id}}</td>
+                            <td>{{special.slug}}</td>
                             <td>{{special.name}}</td>
                             <td>{{special.description}}</td>
                             <td class="controls">

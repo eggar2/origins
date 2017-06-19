@@ -16,6 +16,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Slug</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th>Controls</th>
@@ -24,6 +25,7 @@
                     <tbody>
                         <tr ng-repeat="lifestyle in lifestyles">
                             <td>{{lifestyle.id}}</td>
+                            <td>{{lifestyle.slug}}</td>
                             <td>{{lifestyle.name}}</td>
                             <td>{{lifestyle.description}}</td>
                             <td class="controls">

@@ -2,9 +2,9 @@
 * Copyright (c) 2017 ; Licensed  */
 'use strict';
 
-var csvImport = angular.module('ngCsvImport', []);
+var csvImport = angular.module('ngCsvImport', ['slugifier']);
 
-csvImport.directive('ngCsvImport', function() {
+csvImport.directive('ngCsvImport', function(Slug) {
 	return {
 		restrict: 'E',
 		transclude: true,
@@ -151,9 +151,16 @@ csvImport.directive('ngCsvImport', function() {
 				var start = 0;
 				var columnCount = lines[0].split(content.separator).length;
 
+				var headers_temp = [];
 				var headers = [];
+
 				if (content.header) {
-					headers=lines[0].split(content.separator);
+					
+					headers_temp = lines[0].split(content.separator);
+        			angular.forEach(headers_temp, function(value, key){
+	        			headers.push( Slug.slugify(value) );
+			        });
+
 					start = 1;
 				}
 

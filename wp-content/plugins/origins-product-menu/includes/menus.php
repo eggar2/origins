@@ -10,7 +10,7 @@
             <a href="<?php echo get_site_url(); ?>/wp-admin/admin.php?page=origins_bulk_upload_menu" class="btn btn-success btn-md" id="add-farm"><i class="fa fa-file-text-o" aria-hidden="true"></i> Bulk Upload Menu</a>
             <button type="button" ng-if="rowSelected.length > 0" class="btn btn-danger btn-md" id="bulk-delete-menu" ng-click="deleteMenu(rowSelected)"><i class="fa fa-trash" aria-hidden="true"></i> Delete</button>
 
-            <div class="search pull-right">
+            <div id="menu-search" class="pull-right">
                <input type="text" name="search">
                <a href="#" class="btn btn-primary btn-md"><i class="fa fa-search" aria-hidden="true"></i></a> 
            </div>
@@ -19,7 +19,11 @@
         </div>
 
         <div class="row">
-            <div class="col-md-12 table-responsive">
+            <div class="col-md-12 table-responsive" ng-if="menus.length <= 0">
+                <center><h3>No menu to show.</h3></center>
+            </div>
+            <div class="col-md-12 table-responsive" ng-if="menus.length > 0">
+                <p>Showing {{itemsCount}} items of {{totalItems}}</p>
                 <table class="row-border hover table table-bordered table-striped table-hover">
                     <thead>
                         <tr>
@@ -52,14 +56,16 @@
                             </td>
                             <td class="prices" style="width: 100px;">
                                 <p ng-if="menu.prices" ng-repeat="p in menu.prices">
-                                    <span>{{p.weight}}</span> - <span>${{p.price}}</span>
+                                    <span>{{p.weight}}{{p.weight_type}}</span> - <span>${{p.price}}</span>
                                 </p>
                             </td>
                             <td>{{menu.farm}}</td>
                             <td>{{menu.type}}</td>
                             <td>{{menu.subtype}}</td>
                             <td>{{menu.lifestyle}}</td>
-                            <td>{{menu.special_tags}}</td>
+                            <td>
+                                <p ng-repeat="des in menu.designations" class="nomargin">{{des.name}}</p>
+                            </td>
                             <td class="controls" style="width: 100px;">
                                 <a href="<?php echo get_site_url() . '/wp-admin/admin.php?page=origins_add_menu&edit='; ?>{{menu.id}}" class="edit-menu btn btn-md btn-primary" title="Edit"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                                 <a href="#" class="delete-menu btn btn-md btn-danger" ng-click="deleteMenu(menu.id)" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i></a>

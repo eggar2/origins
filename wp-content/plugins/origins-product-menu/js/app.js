@@ -16,13 +16,14 @@ app.controller('mainController', function( $scope, $loading, $http, $filter, men
 
     $scope.loadMenu = function(page){
         $loading.start('origins-loading');
-        console.log('asdasdasd');
         menuService.getAllMenu(page).then(function(data){
-
-            if( data.length <= 0 && $scope.current_page != 1 ) //reset to page 1 if no items && not page 1
+            console.log(data);
+            if( data.length <= 0 && $scope.current_page != 1 ){ //reset to page 1 if no items && not page 1
                 $scope.setPage( 1 );
-            else
+            }else{
                 $scope.menus = data;
+                $scope.itemsCount = data.length;
+            }
 
             $loading.finish('origins-loading');
         });
@@ -34,9 +35,7 @@ app.controller('mainController', function( $scope, $loading, $http, $filter, men
     $scope.setPage = function(page){
 
         PagerService.getTotalItems().then(function(data){
-
             $scope.rowSelected = [];
-
             $scope.totalItems = data;
             $scope.pager = {};
             if (page < 1 || page > $scope.pager.totalPages) {
@@ -54,7 +53,7 @@ app.controller('mainController', function( $scope, $loading, $http, $filter, men
 
     // PAGINATION ====================================================
 
-    // DELETE SINGLE MENU
+    // DELETE MENU/S
     $scope.deleteMenu = function(menuId){
 
         var modalInstance = $uibModal.open({
@@ -75,19 +74,12 @@ app.controller('mainController', function( $scope, $loading, $http, $filter, men
         });
     };
 
-    // DELETE SELECTED ROWS
-    // $scope.deleteRows = function(){
-    //     console.log($scope.rowSelected);
-        
-    // }
-
     $scope.rowSeletionChanged = function (menu) {
         if($scope.rowSelected.indexOf(menu) !== -1) { //if exists
             $scope.rowSelected.splice($scope.rowSelected.indexOf(menu), 1);
         }else{
             $scope.rowSelected.push(menu);
         }
-        console.log($scope.rowSelected);
     }
 
 });
@@ -177,22 +169,33 @@ app.controller('postMenuController', function( $scope, $loading, $http, $filter,
         if( menu_to_edit ){
             is_edit = true;
             // get menu obj
-            menuService.getMenu(menu_to_edit).then(function(data){
-                console.log( data );
+            menuService.getMenu(menu_to_edit).then(function(response){
+
+                data = response.menu;
                 $scope.menu = data;
                 $scope.lab_result_link = data.lab_result_link;
+
+                console.log(data);
 
                 if( data ){
                   $scope.selectedFarm = $scope.farms.filter(function(item) { return item.id == data.farm })[0];
                   $scope.selectedType = $scope.type_options.filter(function(item) { return item.id == data.type })[0];
                   $scope.selectedSubType = $scope.subtype_options.filter(function(item) { return item.id == data.subtype })[0];
                   $scope.selectedLifestyle = $scope.lifestyles.filter(function(item) { return item.id == data.lifestyle })[0];
-                  $scope.selectedSpecialTags = $scope.special_tags_option.filter(function(item) { return item.id == data.special_tags })[0];
-                  $scope.prices = data.prices;  
-                
+                  // $scope.selectedSpecialTags = $scope.special_tags_option.filter(function(item) { return item.id == data.special_tags })[0];
+                  $scope.prices = data.prices ? data.prices : [];  
+                    
                     $scope.onTypeSelected($scope.selectedType);  
 
                 }
+
+                if( response.designations ){
+                    angular.forEach($scope.special_tags_option, function(tag, key){
+                        if( response.designations.filter(function(item) { return item.designation == tag.id }).length > 0 )
+                            $scope.special_tags_option[key].selected = true;
+                    });
+                }
+
                 
             });
         }else{
@@ -207,7 +210,8 @@ app.controller('postMenuController', function( $scope, $loading, $http, $filter,
         $scope.selectedType = '';
         $scope.selectedSubType = '';
         $scope.selectedLifestyle = '';
-        $scope.selectedSpecialTags = '';
+        // $scope.selectedSpecialTags = '';
+        $scope.designations = [];
         $scope.prices = [];
     };
 
@@ -236,7 +240,10 @@ app.controller('postMenuController', function( $scope, $loading, $http, $filter,
 
     $scope.postMenu = function(menu){
 
-        console.log(menu);
+        $scope.designations = [];
+        angular.forEach($scope.special_tags_option, function(tag){
+          if (tag.selected) $scope.designations.push(tag.id);
+        });
 
         $loading.start('origins-loading');
 
@@ -253,25 +260,30 @@ app.controller('postMenuController', function( $scope, $loading, $http, $filter,
         //     menu.type = $scope.selectedType;
 
         menu.type = $scope.selectedType.id;
-        menu.subtype = $scope.selectedSubType.id;
+
+        if( $scope.selectedSubType ) 
+            menu.subtype = $scope.selectedSubType.id;
+        else
+            menu.subtype = $scope.selectedSubType;
+        // menu.subtype = $scope.selectedSubType.id;
 
         if( $scope.selectedLifestyle ) 
             menu.lifestyle = $scope.selectedLifestyle.id;
         else
             menu.lifestyle = $scope.selectedLifestyle;
 
-        if( $scope.selectedSpecialTags ) 
-            menu.special_tags = $scope.selectedSpecialTags.id;
-        else
-            menu.special_tags = $scope.selectedSpecialTags;
+        // if( $scope.selectedSpecialTags ) 
+        //     menu.special_tags = $scope.selectedSpecialTags.id;
+        // else
+        //     menu.special_tags = $scope.selectedSpecialTags;
 
         menu.prices = $scope.prices;
+        menu.designations = $scope.designations;
 
         // console.log(menu);
-        // return false;
+        // return true;
 
         menuService.postMenu(menu).then(function(data){
-            console.log( data );
             if( data.success ){
                 toastr.success(data.message);
                 if( !is_edit ){

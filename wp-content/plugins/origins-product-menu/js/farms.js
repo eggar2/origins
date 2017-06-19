@@ -4,7 +4,8 @@ angular.module('origins.farms', [
     'ui.bootstrap',
     'toastr',
     'darthwade.loading',
-    'datatables.columnfilter'
+    'datatables.columnfilter',
+    'slugifier'
 ])
 
 .controller('mainFarmController', function( $scope, farmsService, $uibModal, $loading, $http, $filter, DTOptionsBuilder, DTColumnBuilder, DTColumnDefBuilder, toastr ) {
@@ -62,12 +63,13 @@ angular.module('origins.farms', [
 
 })
 
-.controller('farmModalCtrl', function ($uibModalInstance, $scope, farmsService, params) {
+.controller('farmModalCtrl', function ($uibModalInstance, $scope, farmsService, params, Slug) {
 
     $scope.farmObj = angular.copy(params);
 
     $scope.farmSubmit = function(farmObj){
         // save to DB
+        farmObj.slug = Slug.slugify(farmObj.name);
         farmsService.postFarm(farmObj).then(function(data){
             $uibModalInstance.close(data);
         });

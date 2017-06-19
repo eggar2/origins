@@ -40,7 +40,7 @@
 
             <div class="form-group" ng-if="selectedType">
                 <label for="type">Sub Type:</label>
-                <select class="form-control" id="subtype" ng-model="selectedSubType" ng-change="onSubTypeSelected(selectedSubType)" ng-options="s.name for s in subtype_options_filtered" required>
+                <select class="form-control" id="subtype" ng-model="selectedSubType" ng-change="onSubTypeSelected(selectedSubType)" ng-options="s.name for s in subtype_options_filtered">
                     <option value="">--Select Sub Type--</option>
                 </select>
             </div>
@@ -52,17 +52,26 @@
                 </select>
             </div>
 
-            <div class="form-group">
+            <div class="form-group" id="postmenu-designations">
                 <label for="special">Designation:</label>
-                <select id="special" class="form-control" ng-model="selectedSpecialTags" ng-options="special_tags.name for special_tags in special_tags_option">
-                    <option value="">--Select Designation--</option>
-                </select>
+                <!-- <select id="special" class="form-control" ng-model="selectedSpecialTags" ng-options="special_tags.name for special_tags in special_tags_option">
+                    <option value="">Select Designation</option>
+                </select> -->
+
+                <div class="checkbox">
+                    <label ng-repeat="tag in special_tags_option track by $index" class="checkbox-inline">
+                        <input type="checkbox" ng-model="tag.selected" value="{{tag.id}}">{{tag.name}}
+                    </label>
+                </div>
+
             </div>
+
 
             <div class="form-group" id="prices_input">
                 <label for="prices">Prices: </label>
                 <div ng-repeat="price in prices track by $index" class="price-item clearfix">
                     <input type="text" ng-model="price.weight" class="form-control pull-left" placeholder="Weight" required>
+                    <input type="text" ng-model="price.weight_type" class="form-control pull-left" placeholder="Weight Type" required>
                     <input type="text" ng-model="price.price" class="form-control pull-left" placeholder="Price" required>
                     <button type="button" class="btn btn-md btn-danger" ng-show="$last" ng-click="removePrice()">Remove</button>
                 </div>

@@ -85,22 +85,26 @@ https://www.screencast.com/t/J6VqidYxmwp
 
 ================================================================================
 
-Price - add menu weight section
-Bulk Delete
-Search / Filter
-CSV Import - add a post(menu post type) on every menu added
+Price - add menu weight section - DONE
+Bulk Delete - DONE
 
-Frontend
-Print Menu
+CSV Import - add a post(menu post type) on every menu added then add custom field of menu id, same as delete
+Frontend - 
+Print Menu -
+Search / Filter - 
 
 ================================================================================
-
-
-DELETE FROM custom_menu WHERE id IN(11,12)
-
-
-
 
 git add -u
 git commit -a -m "bulk delete"
 git push -u origin master
+
+================================================================================
+
+Clarifications:
+- Types and Subtypes parent-child relationship : http://prntscr.com/fl3xjs
+- Can we have a single column for Designations? and put pre-defined values
+- Change CSV Headings
+- Lab Results header for CSV : 
+
+Post Menu Format : http://prntscr.com/fl74b0

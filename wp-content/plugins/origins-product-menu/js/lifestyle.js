@@ -4,7 +4,8 @@ angular.module('origins.lifestyles', [
     'ui.bootstrap',
     'toastr',
     'darthwade.loading',
-    'datatables.columnfilter'
+    'datatables.columnfilter',
+    'slugifier'
 ])
 
 .controller('mainLifestyleController', function( $scope, lifestylesService, $uibModal, $loading, $http, $filter, DTOptionsBuilder, DTColumnBuilder, DTColumnDefBuilder, toastr ) {
@@ -62,11 +63,13 @@ angular.module('origins.lifestyles', [
 
 })
 
-.controller('lifestyleModalCtrl', function ($uibModalInstance, $scope, lifestylesService, params) {
+.controller('lifestyleModalCtrl', function ($uibModalInstance, $scope, lifestylesService, params, Slug) {
 
     $scope.lifestyleObj = angular.copy(params);
 
     $scope.lifestyleSubmit = function(lifestyleObj){
+        lifestyleObj.slug = Slug.slugify(lifestyleObj.name);
+
         // save to DB
         lifestylesService.postLifestyle(lifestyleObj).then(function(data){
             $uibModalInstance.close(data);

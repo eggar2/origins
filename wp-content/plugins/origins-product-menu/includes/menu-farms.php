@@ -16,6 +16,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Slug</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th>Controls</th>
@@ -24,6 +25,7 @@
                     <tbody>
                         <tr ng-repeat="farm in farms">
                             <td>{{farm.id}}</td>
+                            <td>{{farm.slug}}</td>
                             <td>{{farm.name}}</td>
                             <td>{{farm.description}}</td>
                             <td class="controls">

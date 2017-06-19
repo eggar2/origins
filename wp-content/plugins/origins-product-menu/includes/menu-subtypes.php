@@ -16,6 +16,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Slug</th>
                             <th>Name</th>
                             <th>Parent</th>
                             <th>Description</th>
@@ -25,6 +26,7 @@
                     <tbody>
                         <tr ng-repeat="subtype in subtypes">
                             <td>{{subtype.id}}</td>
+                            <td>{{subtype.slug}}</td>
                             <td>{{subtype.name}}</td>
                             <td>{{subtype.parent_name}}</td>
                             <td>{{subtype.description}}</td>

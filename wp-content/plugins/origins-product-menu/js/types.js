@@ -4,7 +4,8 @@ angular.module('origins.types', [
     'ui.bootstrap',
     'toastr',
     'darthwade.loading',
-    'datatables.columnfilter'
+    'datatables.columnfilter',
+    'slugifier'
 ])
 
 .controller('mainTypeController', function( $scope, typesService, $uibModal, $loading, $http, $filter, DTOptionsBuilder, DTColumnBuilder, DTColumnDefBuilder, toastr ) {
@@ -64,6 +65,33 @@ angular.module('origins.types', [
 
 })
 
+
+// TYPES MODAL
+.controller('typeModalCtrl', function ($uibModalInstance, $scope, typesService, params, Slug) {
+
+    $scope.typeObj = angular.copy(params);
+
+    $scope.typeSubmit = function(typeObj){
+        typeObj.slug = Slug.slugify(typeObj.name);
+        // save to DB
+        typesService.postType(typeObj).then(function(data){
+            $uibModalInstance.close(data);
+        });
+    };
+   
+    $scope.delete = function(typeId){
+        // delete from DB
+        typesService.deleteType(typeId).then(function(data){
+            $uibModalInstance.close(typeId);
+        });
+    };
+
+    $scope.cancel = function(typeId){
+        $uibModalInstance.dismiss();
+    };
+
+})
+
 .controller('mainSubTypeController', function( $scope, typesService, $uibModal, $loading, $http, $filter, DTOptionsBuilder, DTColumnBuilder, DTColumnDefBuilder, toastr ) {
 
     $scope.dtOptions = DTOptionsBuilder.newOptions().withDisplayLength(10);
@@ -106,7 +134,7 @@ angular.module('origins.types', [
 
 })
 
-.controller('subtypeModalCtrl', function ($uibModalInstance, $scope, typesService, subtype, isEdit) {
+.controller('subtypeModalCtrl', function ($uibModalInstance, $scope, typesService, subtype, isEdit, Slug) {
     
     $scope.subtypeObj = angular.copy(subtype);
 
@@ -120,7 +148,9 @@ angular.module('origins.types', [
     });
 
     $scope.subtypeSubmit = function(subtypeObj){
+        subtypeObj.slug = Slug.slugify(subtypeObj.name);
         subtypeObj.parent_type = $scope.selectedParentType.id;
+            
         typesService.postSubType(subtypeObj).then(function(data){
             $uibModalInstance.close(data);
         });
@@ -134,31 +164,6 @@ angular.module('origins.types', [
     };
 
     $scope.cancel = function(){
-        $uibModalInstance.dismiss();
-    };
-
-})
-
-// TYPES MODAL
-.controller('typeModalCtrl', function ($uibModalInstance, $scope, typesService, params) {
-
-    $scope.typeObj = angular.copy(params);
-
-    $scope.typeSubmit = function(typeObj){
-        // save to DB
-        typesService.postType(typeObj).then(function(data){
-            $uibModalInstance.close(data);
-        });
-    };
-   
-    $scope.delete = function(typeId){
-        // delete from DB
-        typesService.deleteType(typeId).then(function(data){
-            $uibModalInstance.close(typeId);
-        });
-    };
-
-    $scope.cancel = function(typeId){
         $uibModalInstance.dismiss();
     };
 

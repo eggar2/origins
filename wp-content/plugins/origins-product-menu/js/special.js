@@ -4,7 +4,8 @@ angular.module('origins.specials', [
     'ui.bootstrap',
     'toastr',
     'darthwade.loading',
-    'datatables.columnfilter'
+    'datatables.columnfilter',
+    'slugifier'
 ])
 
 .controller('mainSpecialController', function( $scope, specialsService, $uibModal, $loading, $http, $filter, DTOptionsBuilder, DTColumnBuilder, DTColumnDefBuilder, toastr ) {
@@ -62,11 +63,12 @@ angular.module('origins.specials', [
 
 })
 
-.controller('specialModalCtrl', function ($uibModalInstance, $scope, specialsService, params) {
+.controller('specialModalCtrl', function ($uibModalInstance, $scope, specialsService, params, Slug) {
 
     $scope.specialObj = angular.copy(params);
 
     $scope.specialSubmit = function(specialObj){
+        specialObj.slug = Slug.slugify(specialObj.name);
         // save to DB
         specialsService.postSpecial(specialObj).then(function(data){
             $uibModalInstance.close(data);

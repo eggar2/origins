@@ -68,6 +68,8 @@ function init_scripts() {
         wp_enqueue_script( 'angular-ui-bootsrap', '/wp-content/plugins/origins-product-menu/lib/bootstrap/ui-bootstrap-1.3.2.min.js', array( ), '', true );
         wp_enqueue_script( 'angular-ui-bootsrap-tpls', '/wp-content/plugins/origins-product-menu/lib/bootstrap/ui-bootstrap-tpls.js', array( ), '', true );
 
+        wp_enqueue_script( 'ng-lodash', '/wp-content/plugins/origins-product-menu/lib/lodash/ng-lodash.min.js', array(), '', true );
+        wp_enqueue_script( 'slugify-js', '/wp-content/plugins/origins-product-menu/lib/slugify/angular-slugify.js', array(), '', true );
         wp_enqueue_script( 'toaster-js', '/wp-content/plugins/origins-product-menu/lib/misc/angular-toastr.tpls.js', array(), '', true );
         wp_enqueue_script( 'loader-js', '//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js', array(), '' );
         wp_enqueue_script( 'loader2-js', '/wp-content/plugins/origins-product-menu/lib/misc/angular-loading.min.js', array(), '', true );
@@ -96,9 +98,9 @@ function init_scripts() {
 
 // MENU MAIN FUNCTION ================================================
 
-// get types
+// get menus
 add_action( 'wp_ajax_get_menus', 'get_menus' );
-add_action( 'wp_ajax_nopriv_get_menus', 'get_menus' );
+add_action( 'wp_ajax_nopriv_get_menus', 'wp_ajax_get_menus' );
 function get_menus(){
     global $wpdb;
     $page = $_POST['page'];
@@ -113,14 +115,14 @@ function get_menus(){
         custom_type.name as type, 
         custom_sub_type.name as subtype, 
         custom_lifestyle.name as lifestyle, 
-        custom_special_tags.name as special_tags, 
+        -- custom_special_tags.name as special_tags, 
         SUBSTRING_INDEX(custom_menu.description," ",5) as description 
         FROM custom_menu 
         LEFT JOIN custom_farm ON custom_menu.farm = custom_farm.id
         LEFT JOIN custom_type ON custom_menu.type = custom_type.id
         LEFT JOIN custom_sub_type ON custom_menu.subtype = custom_sub_type.id
         LEFT JOIN custom_lifestyle ON custom_menu.lifestyle = custom_lifestyle.id
-        LEFT JOIN custom_special_tags ON custom_menu.special_tags = custom_special_tags.id
+        -- LEFT JOIN custom_special_tags ON custom_menu.special_tags = custom_special_tags.id
         ORDER BY custom_menu.id DESC LIMIT 10 ';
 
     if( $page > 1 ){
@@ -133,6 +135,13 @@ function get_menus(){
 
     foreach ($results as $key => $value) {
         $results[$key]->prices = unserialize( $value->prices );
+        $results[$key]->designations = $wpdb->get_results( '
+            SELECT tag.id, tag.name 
+            FROM custom_designations as des
+            LEFT JOIN custom_menu as menu ON menu.id = des.menu
+            LEFT JOIN custom_special_tags as tag ON tag.id = des.designation
+            WHERE menu = ' . $value->id 
+        );
     }
 
     echo json_encode($results);
@@ -169,7 +178,7 @@ function origins_post_menu(){
         'cbs_ratio' => $menu['cbs_ratio'],
         'lab_result_link' => $menu['lab_result_link'],
         'prices' => serialize( $menu['prices'] ),
-        'special_tags' => $menu['special_tags'] ? $menu['special_tags'] : null,
+        // 'special_tags' => $menu['special_tags'] ? $menu['special_tags'] : null,
         'type' => $menu['type'] ? $menu['type'] : null,
         'subtype' => $menu['subtype'] ? $menu['subtype'] : null,
         'farm' => $menu['farm'] ? $menu['farm'] : null,
@@ -178,13 +187,24 @@ function origins_post_menu(){
 
     if( isset( $menu['id'] ) && $menu['id'] <> '' ){ //edit
         $result = $wpdb->update( 'custom_menu', $menu_array, array( 'id' => $menu['id']) );
+        $_menu = $menu['id'];
         $message = "Menu successfull updated!";
     }else{
-        $result = $wpdb->insert( 'custom_menu', $menu_array );
+        $result = $wpdb->insert( 'custom_menu', $menu_array ); 
+        $_menu = $wpdb->insert_id;
         $message = "Menu successfull added!";
     }
 
-    if( $result )
+    // designations
+    $reset = $wpdb->delete( 'custom_designations', array('menu' => $_menu) );
+    foreach ($menu['designations'] as $key => $value) {
+        $wpdb->insert( 'custom_designations', array(
+            'menu' => $_menu,
+            'designation' => $value
+            ) );
+    }
+
+    if( $result || $reset )
         echo json_encode( array( 'result' => $result, 'success' => true, 'message' => $message ) );
     else
         echo json_encode( array( 'message' => $wpdb->last_error, 'success' => false ) );
@@ -198,8 +218,13 @@ add_action( 'wp_ajax_nopriv_origins_get_menu', 'origins_get_menu' );
 function origins_get_menu(){
     global $wpdb;
     $menuId = $_POST['menuId'];
-    $response = $wpdb->get_row( "SELECT * FROM custom_menu WHERE id = " . $menuId );
-    $response->prices = unserialize( $response->prices );
+    $response = array();
+
+    $response['menu'] = $wpdb->get_row( "SELECT * FROM custom_menu WHERE id = " . $menuId );
+    $response['menu']->prices = unserialize( $response['menu']->prices );
+
+    $response['designations'] = $wpdb->get_results( "SELECT * FROM custom_designations WHERE menu = " . $menuId );
+
     echo json_encode($response);
     wp_die();
 }
@@ -251,7 +276,7 @@ add_action( 'wp_ajax_nopriv_get_origins_subtypes', 'get_origins_subtypes' );
 function get_origins_subtypes(){
     global $wpdb;
     $results = $wpdb->get_results( 'SELECT 
-        custom_sub_type.id, custom_sub_type.name, custom_sub_type.description, custom_sub_type.parent_type, custom_type.name as parent_name
+        custom_sub_type.id, custom_sub_type.slug, custom_sub_type.name, custom_sub_type.description, custom_sub_type.parent_type, custom_type.name as parent_name
         FROM custom_sub_type
         LEFT JOIN custom_type ON custom_type.id = custom_sub_type.parent_type' 
     );
@@ -352,6 +377,7 @@ function post_origins_farm(){
 
     if( isset( $params['id'] ) ){ //edit
         $result = $wpdb->update( 'custom_farm', array(
+            'slug' => $params['slug'],
             'name' => $params['name'],
             'description' => $params['description']
         ), array( 'id' => $params['id']) );
@@ -437,6 +463,7 @@ function post_origins_special(){
     if( isset( $params['id'] ) ){ //edit
         $result = $wpdb->update( 'custom_special_tags', array(
             'name' => $params['name'],
+            'slug' => $params['slug'],
             'description' => $params['description']
         ), array( 'id' => $params['id']) );
         $message = "Item successfull updated!";

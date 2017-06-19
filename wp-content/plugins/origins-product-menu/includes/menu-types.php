@@ -16,6 +16,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Slug</th>
                             <th>Name</th>
                             <th>Description</th>
                             <th>Controls</th>
@@ -24,6 +25,7 @@
                     <tbody>
                         <tr ng-repeat="type in types">
                             <td>{{type.id}}</td>
+                            <td>{{type.slug}}</td>
                             <td>{{type.name}}</td>
                             <td>{{type.description}}</td>
                             <td class="controls">
@@ -46,10 +48,6 @@
             <form id="addtype" ng-submit="typeSubmit(typeObj)">
                 <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" ng-model="typeObj.name" required>
-                </div>
-                <div class="form-group">
-                    <label for="name">Parent</label>
                     <input type="text" class="form-control" id="name" ng-model="typeObj.name" required>
                 </div>
                 <div class="form-group">

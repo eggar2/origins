@@ -1,3 +1,9 @@
+/*global*/
+.nomargin{ margin: 0; }
+
+/*menus*/
+#menu-search input{ height: 35px; }
+
 /*controls*/
 table td.controls{ text-align: center; width: 80px; }
 table td.prices p{ margin-bottom: 0; }
@@ -10,13 +16,13 @@ table td.prices p span:first-child{ font-weight: bold; }
 /*POST MENU*/
 #prices_input label{ display: block; }
 #prices_input .price-item{ margin-bottom: 10px; }
-#prices_input .price-item input.form-control{ width: 40%; margin-right: 10px; }
+#prices_input .price-item input.form-control{ width: 25%; margin-right: 10px; }
 #prices_input .price-item button.btn{ width: 10%; }
 input#upload-btn{ margin-top: 10px; }
 
 #post-menu-form select{ height: 38px; }
 
 /*BULK IMPORTER*/
-
+.csv_uploader input{ width: 100%; }
 
 
