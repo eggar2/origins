@@ -87,9 +87,13 @@ https://www.screencast.com/t/J6VqidYxmwp
 
 Price - add menu weight section - DONE
 Bulk Delete - DONE
-
-CSV Import - add a post(menu post type) on every menu added then add custom field of menu id, same as delete
-Frontend - 
+CSV Import - CSV format based on the updated spreadsheet DONE
+Bulk Delete - 
+Auto Add Post on menu add - add a post(menu post type) on every menu added then add custom field of menu id, same as delete
+Frontend - shortcodes
+	- interactive menu
+	- full menu
+	- print menu
 Print Menu -
 Search / Filter - 
 
@@ -101,10 +105,47 @@ git push -u origin master
 
 ================================================================================
 
-Clarifications:
 - Types and Subtypes parent-child relationship : http://prntscr.com/fl3xjs
 - Can we have a single column for Designations? and put pre-defined values
 - Change CSV Headings
-- Lab Results header for CSV : 
+- Lab Results header for CSV : "Lab Result" values - full link to img/file
+- Farms should be dynamic
+
 
 Post Menu Format : http://prntscr.com/fl74b0
+
+
+DSIGNATION QUERY
+SELECT 
+        custom_menu.id, 
+        custom_menu.name, 
+        custom_menu.cbs_ratio, 
+        custom_menu.lab_result_link, 
+        custom_menu.prices, 
+        custom_farm.name as farm, 
+        custom_type.name as type, 
+        custom_sub_type.name as subtype, 
+        custom_lifestyle.name as lifestyle, 
+        
+        
+        SUBSTRING_INDEX(custom_menu.description," ",5) as description 
+        FROM custom_menu 
+        LEFT JOIN custom_farm ON custom_menu.farm = custom_farm.id
+        LEFT JOIN custom_type ON custom_menu.type = custom_type.id
+        LEFT JOIN custom_sub_type ON custom_menu.subtype = custom_sub_type.id
+        LEFT JOIN custom_lifestyle ON custom_menu.lifestyle = custom_lifestyle.id
+        
+        INNER JOIN custom_designations ON custom_designations.menu = custom_menu.id
+        WHERE custom_designations.designation = 2
+        
+
+Hi Guys,
+
+I have finished the backend interfaces and updated the CSV import feature base on the new format. 
+Here are my updates on the frontend modules(We created these modules as part of our dedicated plugin):
+	Interactive Product Menu - started creating dynamic query scripts for interactive filter, All Menu page and Print Menu. Design to be followed.
+	All Menu - Dependent on Interactive Product Menu
+	Print Menu - Dependent on Interactive Product Menu
+
+
+After finishing these items tomorrow, we will then proceed to cloning the live site and upload it to new server as "staging site" temporarily for us to test, then replace the whole menu structure with our new dedicated plugin.

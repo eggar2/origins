@@ -410,4 +410,10 @@ app.service('menuService', function ($http, $q, $loading) {
 //     };
 // });
 
+app.filter('origins_sanitize', function () {
+    return function (input) {
+        return input.replace(/\\/g, '');
+    };
+});
+
 

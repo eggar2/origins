@@ -27,7 +27,9 @@
                 <table class="row-border hover table table-bordered table-striped table-hover">
                     <thead>
                         <tr>
-                            <th></th>
+                            <th>
+                                <!-- <input type="checkbox" ng-model="allRows"> -->
+                            </th>
                             <th>ID</th>
                             <th>Name</th>
                             <th>Description</th>
@@ -48,7 +50,7 @@
                                 <input type="checkbox" ng-click="rowSeletionChanged(menu.id)">
                             </td>
                             <td>{{menu.id}}</td>
-                            <td>{{menu.name}}</td>
+                            <td>{{menu.name | origins_sanitize}}</td>
                             <td>{{menu.description}}</td>
                             <td>{{menu.cbs_ratio}}</td>
                             <td>

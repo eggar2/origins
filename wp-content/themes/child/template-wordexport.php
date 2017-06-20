@@ -11,10 +11,7 @@ get_header(); ?>
 
 			<?php
 				while ( have_posts() ) : the_post();
-					get_template_part( 'template-parts/page/content', 'page' );
-
-					generateText();
-
+					the_content();
 				endwhile; // End of the loop.
 			?>
 

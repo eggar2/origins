@@ -95,6 +95,26 @@ function init_scripts() {
 
 }
 
+// FRONTEND SCRIPTS
+add_action( 'wp_enqueue_scripts', 'init_frontend_scripts' );
+
+function init_frontend_scripts() {
+    // Bootstrap
+    wp_enqueue_style( 'admin-bootstrap-css', '/wp-content/plugins/origins-product-menu/lib/bootstrap/bootstrap.min.css' );
+    wp_enqueue_script( 'admin-bootstrap-js', '/wp-content/plugins/origins-product-menu/lib/bootstrap/bootstrap.min.js', array(), '', true );
+
+    wp_enqueue_script( 'ae-angular', '//ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js', array(), '', true );
+    wp_enqueue_script( 'ng-lodash', '/wp-content/plugins/origins-product-menu/lib/lodash/ng-lodash.min.js', array(), '', true );
+    wp_enqueue_script( 'slugify-js', '/wp-content/plugins/origins-product-menu/lib/slugify/angular-slugify.js', array(), '', true );
+    
+    wp_enqueue_script( 'loader-js', '//cdnjs.cloudflare.com/ajax/libs/spin.js/1.2.7/spin.min.js', array(), '' );
+    wp_enqueue_script( 'loader2-js', '/wp-content/plugins/origins-product-menu/lib/misc/angular-loading.min.js', array(), '', true );
+    wp_enqueue_style( 'loader-css', '/wp-content/plugins/origins-product-menu/lib/misc/angular-loading.css' );
+
+    // interactive menu 
+    wp_enqueue_script( 'interactive-menu-js', '/wp-content/plugins/origins-product-menu/shortcodes/shortcodes.js', array(), '', true );
+}
+
 
 // MENU MAIN FUNCTION ================================================
 
@@ -203,6 +223,16 @@ function origins_post_menu(){
             'designation' => $value
             ) );
     }
+
+    //ADD POST TO MENU POST TYPE HERE -- later after uploading on new server
+    // $new_post = array(
+    //     'post_type' => 'menu',
+    //     'post_title' => wp_strip_all_tags( $menu['name'] ),
+    //     'post_date' => date('Y-m-d H:i:s'),
+    //     'post_status' => 'publish',
+    //     'ping_status' => 'open',
+    // );
+    // $post_id = wp_insert_post( $new_post, );
 
     if( $result || $reset )
         echo json_encode( array( 'result' => $result, 'success' => true, 'message' => $message ) );
@@ -487,25 +517,93 @@ function delete_origins_special(){
 }
 
 
-// function install_p() {
 
-//   global $wpdb;
+// ===================== SHORTCODES ========================
+add_shortcode('interactive-menu', 'interactive_menu');
+function interactive_menu($attr, $content) {
+    ob_start();
+    include 'shortcodes/interactive_menu.php';
+    $ret = ob_get_contents();
+    ob_end_clean();
+    return $ret;
+}
 
-//     $prefix = $wpdb->get_blog_prefix(BLOG_ID_CURRENT_SITE);
-//     $table_name = $prefix . 'capitalization';
+add_shortcode('origins-full-menu', 'full_menu');
+function full_menu($attr, $content) {
+    ob_start();
+    include 'shortcodes/full_menu.php';
+    $ret = ob_get_contents();
+    ob_end_clean();
+    return $ret;
+}
 
-//     $charset_collate = $wpdb->get_charset_collate();
-//     $sql = "CREATE TABLE $table_name (
-//       id mediumint(9) NOT NULL AUTO_INCREMENT,
-//       amount varchar(100) NOT NULL,
-//       currency varchar(100) NOT NULL,
-//       country varchar(100) NOT NULL,
-//       isactive mediumint(9) NOT NULL,
-//       UNIQUE KEY id (id)
-//     ) $charset_collate;";
+add_action( 'wp_ajax_get_sc_menus_filtered', 'get_sc_menus_filtered' );
+add_action( 'wp_ajax_nopriv_get_sc_menus_filtered', 'get_sc_menus_filtered' );
+function get_sc_menus_filtered(){
+    global $wpdb;
 
-//     $wpdb->query( $sql );
+    $filters = $_POST['filters'];
 
-// }
+    $query_string = 'SELECT 
+        custom_menu.id, 
+        custom_menu.name, 
+        custom_menu.cbs_ratio, 
+        custom_menu.lab_result_link, 
+        custom_menu.prices, 
+        custom_farm.name as farm, 
+        custom_type.name as type, 
+        custom_sub_type.name as subtype, 
+        custom_lifestyle.name as lifestyle, 
+        SUBSTRING_INDEX(custom_menu.description," ",5) as description 
+        FROM custom_menu 
+        LEFT JOIN custom_farm ON custom_menu.farm = custom_farm.id
+        LEFT JOIN custom_type ON custom_menu.type = custom_type.id
+        LEFT JOIN custom_sub_type ON custom_menu.subtype = custom_sub_type.id
+        LEFT JOIN custom_lifestyle ON custom_menu.lifestyle = custom_lifestyle.id';
 
-// register_activation_hook( __FILE__, 'install_p' );
+        if( $filters['designation'] )
+            $query_string .= ' INNER JOIN custom_designations ON custom_designations.menu = custom_menu.id';
+
+    // FILTER
+    if( $filters['designation'] == '*' ){
+        if( $filters['lifestyle'] > 0 ){
+            $query_string .= ' WHERE custom_lifestyle.id = ' . $filters['lifestyle'];
+        }
+    }else{
+        if( count( $filters ) > 0 ){
+            $query_string .= ' WHERE';
+            if( $filters['lifestyle'] > 0 ){
+                $query_string .= ' custom_lifestyle.id = ' . $filters['lifestyle'];
+                if( count( $filters ) > 1 )
+                    $query_string .= ' AND';
+            }
+
+            if( $filters['type'] )
+                $query_string .= ' custom_type.id = ' . $filters['type'];
+
+            if( $filters['subtype'] )
+                $query_string .= ' custom_sub_type.id = ' . $filters['subtype'];
+
+            if( $filters['designation'] && $filters['designation'] != '*' )
+                $query_string .= ' custom_designations.designation = ' . $filters['designation'];
+        }
+    }
+
+    $query_string .= ';';
+
+    $results = $wpdb->get_results($query_string);
+
+    foreach ($results as $key => $value) {
+        $results[$key]->prices = unserialize( $value->prices );
+        $results[$key]->designations = $wpdb->get_results( '
+            SELECT tag.id, tag.name 
+            FROM custom_designations as des
+            LEFT JOIN custom_menu as menu ON menu.id = des.menu
+            LEFT JOIN custom_special_tags as tag ON tag.id = des.designation
+            WHERE menu = ' . $value->id 
+        );
+    }
+
+    echo json_encode($results);
+    wp_die();
+}
