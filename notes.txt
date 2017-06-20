@@ -138,14 +138,3 @@ SELECT
         INNER JOIN custom_designations ON custom_designations.menu = custom_menu.id
         WHERE custom_designations.designation = 2
         
-
-Hi Guys,
-
-I have finished the backend interfaces and updated the CSV import feature base on the new format. 
-Here are my updates on the frontend modules(We created these modules as part of our dedicated plugin):
-	Interactive Product Menu - started creating dynamic query scripts for interactive filter, All Menu page and Print Menu. Design to be followed.
-	All Menu - Dependent on Interactive Product Menu
-	Print Menu - Dependent on Interactive Product Menu
-
-
-After finishing these items tomorrow, we will then proceed to cloning the live site and upload it to new server as "staging site" temporarily for us to test, then replace the whole menu structure with our new dedicated plugin.
